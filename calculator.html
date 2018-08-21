@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Calculator</title>
+	<meta charset="utf-8">
+	<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+	<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+	<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+</head>
+<body>
+	<div id="app"></div>
+	<style type="text/css">
+		body {
+		  background: #20262E;
+		  padding: 20px;
+		  font-family: Helvetica;
+		}
+
+		#app {
+		  background: white;
+		  border-radius: 4px;
+		  padding: 20px;
+		  transition: all 0.2s;
+		}
+	</style>
+	<script type="text/babel">
+		const style = {
+		  calc: {
+		    height: '300px',
+		    width: '200px',
+		    borderRadius: '3%',
+		    padding: '10px',
+		    margin: '0 auto',
+		    backgroundColor: '#e6e6e6',
+		    borderLeft: '1px solid #dedede',
+		    borderBottom: '1px solid #dedede',
+		    boxShadow: '20px -10px 60px #00000040, inset 10px -10px 60px #00000015',
+		    transform: 'rotate3d(0,0,0,-15deg)',
+		  },
+		  calc_display: {
+		    height: '20%',
+		    marginBottom: '10%',
+		    fontSize: '3.5rem',
+		    textAlign: 'right',
+		    backgroundColor: '#f8f8f8',
+		    boxShadow: 'inset 4px -3px 15px lightgrey',
+		    overflow: 'hidden',
+		    fontFamily: 'monospace',
+		    color: 'orange',
+		  },
+		  calc_panel: {
+		    display: 'grid',
+		    gridTemplateColumns: '1fr 1fr 1fr 1fr',
+		    gridGap: '10px',
+		    height: '70%',
+		  },
+		  calc_panel_btn: {
+		    borderRadius: '5%',
+		    backgroundColor: 'white',
+		    border: 'none',
+		    boxShadow: '1px -1px 4px lightgrey',
+		    fontSize: '1rem',
+		  },
+		  calc_panel_btn_alert: {
+		    borderRadius: '5%',
+		    backgroundColor: 'orange',
+		    color: 'white',
+		    border: 'none',
+		    boxShadow: '1px -1px 4px lightgrey',
+		    fontSize: '1rem',
+		  },
+		}
+
+		class CalcBtn extends React.Component {
+		  constructor(props) {
+		    super(props);
+		    this.selectChar = this.selectChar.bind(this);
+		  }   
+		  
+			selectChar() {
+		    const { char } = this.props;
+				this.props.addToExpression(char);
+			}
+		  
+		  render() {
+		  	const { char } = this.props;
+		  	return (
+		    	<button onClick={this.selectChar} style={this.props.style}>
+		    		{char}
+		    	</button>
+		    )
+		  }
+		}
+
+		class Calc extends React.Component {
+		  constructor(props) {
+		    super(props)
+		    this.state = {
+		    	expression: '',
+		    }
+		    this.addToExpression = this.addToExpression.bind(this);
+		    this.resolve = this.resolve.bind(this);
+		    this.erase = this.erase.bind(this);
+		    this.del = this.del.bind(this);
+		  }
+		  
+		  addToExpression(char) {
+		  	this.setState((prevState) => {
+		     return	{expression: prevState.expression + char}
+		    })
+		  }
+
+		  resolve() {
+		    this.setState((prevState) => {
+		     return {expression: eval(prevState.expression).toString()}
+		    })
+		  }
+
+		  erase() {
+		    this.setState({expression: ''})
+		  }
+
+		  del() {
+		    this.setState((prevState) => {
+		     return {expression: prevState.expression.slice(0, -1)}
+		    })
+		  }
+		  
+		  render() {
+		    return (
+		      <div style={style.calc}>
+		        <div style={style.calc_display}>
+		          <span>{this.state.expression}</span>
+		        </div>
+		        <div style={style.calc_panel}>        
+		          <CalcBtn char='C' addToExpression={this.erase} style={style.calc_panel_btn_alert}/>
+		          <CalcBtn char='del' addToExpression={this.del} style={style.calc_panel_btn_alert}/>
+		          { 
+		            ['(',')','1','2','3','*','4','5','6','/','7','8','9','-','.','0','+']
+		            .map(num => (
+		              <CalcBtn char={num} addToExpression={this.addToExpression} style={style.calc_panel_btn}/>
+		            ))
+		          }
+		          <CalcBtn char='=' addToExpression={this.resolve} style={style.calc_panel_btn}/>
+		        </div>
+		      </div>
+		    )
+		  }
+		}
+
+		ReactDOM.render(<Calc/>, document.querySelector("#app"))
+	</script>
+</body>
+</html>
